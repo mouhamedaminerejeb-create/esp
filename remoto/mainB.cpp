@@ -5,16 +5,16 @@
 #include <Adafruit_AHTX0.h>
 #include <ArduinoJson.h>
 
-// --- CONFIGURAZIONE RETE ---
+// Configurazione di rete
 const char* ssid = "giga";
 const char* password = "12345678";
 const char* broker = "broker.hivemq.com";
 const char* rowID = "B"; // Identificativo di questa fila
 
-// --- SOGLIE ---
+// Soglie di sicurezza
 const long parkingHeight = 6; 
 
-// --- HARDWARE ---
+// Hardware locale
 Adafruit_BMP280 bmp;
 Adafruit_AHTX0 aht;
 const int sensorCount = 2;
