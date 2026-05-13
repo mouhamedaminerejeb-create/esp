@@ -27,9 +27,9 @@ struct LocalSensor {
   volatile long lastDistance;
 };
 
-LocalSensor sensors[sensorCount] = {
-  {5, 18, "1", 0, -1}, // Sensore 1 della Fila B
-  {17, 16, "2", 0, -1} // Sensore 2 della Fila B
+LocalSensor sensors[sensorCount] = { //Inizializzazione di due sensori su...
+  {5, 18, "1", 0, -1},                    //...(trigPin=5),(echoPin=18),(sensore "1"),(tempo=0),(distanza iniziale=-1, invalida)
+  {17, 16, "2", 0, -1}                    //...(trigPin=17),(echoPin=16),(sensore "2"),(tempo=0),(distanza iniziale=-1, invalida)
 };
 
 WiFiClient espClient;
@@ -37,8 +37,7 @@ PubSubClient mqttClient(espClient);
 
 float curT = 0, curP = 0, curH = 0;
 
-// --- INTERRUPT PER ULTRASUONI ---
-void IRAM_ATTR handleEcho(int i) {
+void IRAM_ATTR handleEcho(int i) {                    //Interrupt per la lettura dell'echoPin
   if (digitalRead(sensors[i].echoPin) == HIGH) {
     sensors[i].pulseStart = micros();
   } else {
@@ -49,7 +48,7 @@ void IRAM_ATTR handleEcho(int i) {
 void IRAM_ATTR echoISR0() { handleEcho(0); }
 void IRAM_ATTR echoISR1() { handleEcho(1); }
 
-void triggerSensors() {
+void triggerSensors() {                               //Funzione per leggere il sensore
   for(int i=0; i<sensorCount; i++) {
     digitalWrite(sensors[i].trigPin, LOW); delayMicroseconds(2);
     digitalWrite(sensors[i].trigPin, HIGH); delayMicroseconds(10);
@@ -58,8 +57,7 @@ void triggerSensors() {
   }
 }
 
-// --- FUNZIONE DI INVIO DATI VIA MQTT ---
-void publishData(int sensorIndex) {
+void publishData(int sensorIndex) {                   //Funzione di invio dati via MQTT
   StaticJsonDocument<256> doc;
   long d = sensors[sensorIndex].lastDistance;
   
@@ -81,7 +79,7 @@ void publishData(int sensorIndex) {
   char buffer[256];
   serializeJson(doc, buffer);
   
-  // Topic: FermiModena/Rejeb/parking/FilaB/status
+  // Topic: FermiModena/Rejeb/parking/B/status
   String topic = "FermiModena/Rejeb/parking/" + String(rowID) + "/status";
   mqttClient.publish(topic.c_str(), buffer);
   
@@ -125,7 +123,7 @@ void loop() {
   mqttClient.loop();
 
   static unsigned long lastMeasure = 0;
-  if (millis() - lastMeasure > 3000) { // Invia dati ogni 3 secondi
+  if (millis() - lastMeasure > 3000) { //Invia dati ogni 3 secondi
     triggerSensors();
     
     // Lettura Meteo
